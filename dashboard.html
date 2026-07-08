@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">Phish<span>Guard</span></div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="training.html">Training</a>
+                <a href="quiz.html">Quiz</a>
+                <a href="results.html">Results</a>
+                <a href="profile.html">Profile</a>
+                <a href="admin.html">Admin</a>
+                <span class="user-info" id="username-display">User</span>
+                <button class="logout" onclick="logout()">Logout</button>
+                <span id="status-badge">⏳</span>
+            </div>
+        </nav>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number" id="quizzes-taken">-</div>
+                <div class="label">Quizzes Taken</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="average-score">-</div>
+                <div class="label">Average Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="best-score">-</div>
+                <div class="label">Best Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="completed">-</div>
+                <div class="label">Completed</div>
+            </div>
+        </div>
+
+        <!-- Training Progress -->
+        <div class="card" style="margin-bottom:20px;">
+            <div id="training-progress">
+                <div class="loading-text">Loading training progress...</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card chart-card">
+            <h3>📈 Your Progress Over Time</h3>
+            <canvas id="progress-chart" width="600" height="200"></canvas>
+        </div>
+
+        <!-- Recent Results -->
+        <div class="card">
+            <h3>📊 Recent Quiz Results</h3>
+            <div id="recent-results"><div class="loading-text">Loading...</div></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard - Quiz</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">Phish<span>Guard</span></div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="training.html">Training</a>
+                <a href="quiz.html" class="active">Quiz</a>
+                <a href="results.html">Results</a>
+                <a href="profile.html">Profile</a>
+                <a href="admin.html">Admin</a>
+                <span class="user-info" id="username-display">User</span>
+                <button class="logout" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+        <div class="card">
+            <h2>📝 Take a Quiz</h2>
+            <div id="quiz-area">Quiz questions will appear here.</div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

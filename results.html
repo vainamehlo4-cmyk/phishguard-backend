@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+<head><title>PhishGuard - Results</title><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="container">
+    <nav class="navbar">
+        <div class="logo">Phish<span>Guard</span></div>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="training.html">Training</a>
+            <a href="quiz.html">Quiz</a>
+            <a href="results.html" class="active">Results</a>
+            <a href="profile.html">Profile</a>
+            <a href="admin.html">Admin</a>
+            <span class="user-info" id="username-display">User</span>
+            <button class="logout" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div class="card"><h2>📊 Your Results</h2><div id="results-list">Loading...</div></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

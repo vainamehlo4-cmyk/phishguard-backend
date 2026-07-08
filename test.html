@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PhishGuard Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #0a1628; color: white; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #1a5c2a; }
+        .error { background: #5c1a1a; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .data-box { background: #1a1a2e; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ PhishGuard</h1>
+    <div id="status" class="status">⏳ Checking API...</div>
+    
+    <div class="data-box">
+        <h3>📊 Dashboard</h3>
+        <div id="dashboard-data">Loading...</div>
+    </div>
+
+    <div class="data-box">
+        <h3>👥 Users</h3>
+        <div id="users-data">Loading...</div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        async function checkAPI() {
+            const statusEl = document.getElementById('status');
+            try {
+                const response = await fetch(`${API_URL}/api/healthz`);
+                if (response.ok) {
+                    statusEl.className = 'status connected';
+                    statusEl.innerHTML = '✅ Connected to backend!';
+                    loadDashboard();
+                    loadUsers();
+                } else {
+                    statusEl.className = 'status error';
+                    statusEl.innerHTML = '❌ Backend error!';
+                }
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.innerHTML = `❌ Cannot connect to backend (${API_URL}) - Make sure server.js is running!`;
+                console.error('Error:', error);
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_URL}/api/dashboard`);
+                const data = await response.json();
+                document.getElementById('dashboard-data').innerHTML = `
+                    <p><strong>User:</strong> ${data.user.username}</p>
+                    <p><strong>Quizzes Taken:</strong> ${data.stats.quizzesTaken}</p>
+                    <p><strong>Average Score:</strong> ${data.stats.averageScore}%</p>
+                    <p><strong>Best Score:</strong> ${data.stats.bestScore}%</p>
+                    <p><strong>Completed:</strong> ${data.stats.completed}%</p>
+                `;
+            } catch (error) {
+                document.getElementById('dashboard-data').innerHTML = '❌ Error loading dashboard';
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/api/users`);
+                const users = await response.json();
+                let html = '';
+                users.forEach(user => {
+                    html += `<p>👤 ${user.username} (${user.email})</p>`;
+                });
+                document.getElementById('users-data').innerHTML = html || 'No users found';
+            } catch (error) {
+                document.getElementById('users-data').innerHTML = '❌ Error loading users';
+            }
+        }
+
+        // Run on page load
+        checkAPI();
+    </script>
+</body>
+</html>
