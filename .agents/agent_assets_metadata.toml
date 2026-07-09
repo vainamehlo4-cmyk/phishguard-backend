@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "Za0qs4h0Wg7oK9UInZPh1"
+uri = "file://phishguard.tar.gz"
+type = "unspecified"
+title = "PhishGuard Project (tar.gz)"
