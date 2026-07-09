@@ -12,12 +12,12 @@ async function setup() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
-        "passwordHash" VARCHAR(255) NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
         email VARCHAR(255),
         "fullName" VARCHAR(255),
         role VARCHAR(50) DEFAULT 'user',
         department VARCHAR(255),
-        "createdAt" TIMESTAMP DEFAULT NOW()
+        created_at TIMESTAMP DEFAULT NOW()
       )
     `);
     console.log('✅ Table "users" is ready');
@@ -25,9 +25,9 @@ async function setup() {
     const passwordHash = bcrypt.hashSync('1234', 10);
 
     const result = await pool.query(
-      `INSERT INTO users (username, "passwordHash", email, "fullName", role, "createdAt")
+      `INSERT INTO users (username, password_hash, email, "fullName", role, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW())
-       ON CONFLICT (username) DO UPDATE SET "passwordHash" = $2
+       ON CONFLICT (username) DO UPDATE SET password_hash = $2
        RETURNING *`,
       ['veemehlo', passwordHash, 'admin@phishguard.com', 'Administrator', 'admin']
     );
