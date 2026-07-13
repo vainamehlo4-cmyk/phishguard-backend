@@ -25,6 +25,29 @@ async function verifyDatabaseConnection() {
   }
 }
 
+async function ensureUsersTableExists() {
+  // auth.ts uses raw SQL `SELECT * FROM users ...` so we must ensure table exists.
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        email VARCHAR(255),
+        "fullName" VARCHAR(255),
+        role VARCHAR(50) DEFAULT 'user',
+        department VARCHAR(255),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    logger.info('✅ Ensured table "users" exists');
+  } catch (err) {
+    logger.error({ err }, 'Failed ensuring "users" table exists');
+    throw err;
+  }
+}
+
 async function startServer() {
   logger.info({ port }, "Starting server");
 
@@ -32,8 +55,10 @@ async function startServer() {
     logger.info("Verifying database connectivity");
     await verifyDatabaseConnection();
     logger.info("Database connection verified");
+
+    await ensureUsersTableExists();
   } catch (err) {
-    logger.error({ err }, "Database connectivity check failed");
+    logger.error({ err }, "Database initialization failed");
     process.exit(1);
   }
 
