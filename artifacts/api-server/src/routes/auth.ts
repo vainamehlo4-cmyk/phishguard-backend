@@ -2,7 +2,8 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { pool } from "@workspace/db";
+import { pool, db, usersTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
@@ -142,18 +143,18 @@ router.post("/register", async (req, res) => {
     const saltRounds = 10;
     const password_hash = await bcrypt.hash(password, saltRounds);
     
-    // Insert the new user
+    // Insert the new user (use table field names defined in schema)
     const [newUser] = await db.insert(usersTable).values({
       username,
-      password_hash: password_hash,
+      passwordHash: password_hash,
       email: email || null,
       fullName: fullName || null,
       role: "user",
-      created_at: new Date(),
+      createdAt: new Date(),
     }).returning();
     
     // Return user info
-    res.status(201).json({
+    return res.status(201).json({
       user: {
         id: newUser.id,
         username: newUser.username,
@@ -164,7 +165,7 @@ router.post("/register", async (req, res) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 

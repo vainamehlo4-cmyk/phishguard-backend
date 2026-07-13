@@ -76,6 +76,6 @@
     "vite": "catalog:",
     "vite-plugin-pwa": "^0.18.0",
     "wouter": "^3.3.5",
-    "zod": "^4.27.0"
+    "zod": "^4.4.3"
   }
 }
