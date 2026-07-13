@@ -38,10 +38,20 @@ export default function Login() {
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     // Debug: confirm what RHF + Zod produced at submit time
-    console.debug("[login] submit values:", {
+    console.debug("login submit values", {
       username: values.username,
       passwordLength: values.password?.length,
     });
+
+    // Hard guard: avoid calling the API with empty credentials
+    if (!values.username || !values.password) {
+      toast({
+        variant: "destructive",
+        title: "Missing credentials",
+        description: "Enter both username and password.",
+      });
+      return;
+    }
 
     loginMutation.mutate(
       { data: values },
