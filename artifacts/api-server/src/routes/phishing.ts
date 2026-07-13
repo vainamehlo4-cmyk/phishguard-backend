@@ -183,10 +183,10 @@ router.post('/submit-quiz', authMiddleware, async (req: any, res) => {
        VALUES ($1, $2, $3, $4, NOW())`,
       [userId, score, totalQuestions, answers ? JSON.stringify(answers) : null]
     );
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (err) {
     console.error('Error saving quiz:', err);
-    res.status(500).json({ error: 'Database error' });
+    return res.status(500).json({ error: 'Database error' });
   }
 });
 

@@ -26,27 +26,7 @@ export default function Training() {
 
   const handleComplete = (id: number) => {
     completeModule.mutate(
-      { data: { moduleId: id } as any }, // Assuming body takes moduleId, but the spec says no params? Let me check API spec later. Wait, the auto generated `useCompleteTrainingModule` might take an ID.
-      // Wait, let's just pass id to custom fetch. Ah, the API spec says `POST /api/training/modules/{id}/complete`. So it takes an `id`.
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListTrainingModulesQueryKey() });
-          toast({
-            title: "Module Completed",
-            description: "Your training record has been updated.",
-          });
-        }
-      }
-    );
-  };
-
-  // Wait, let me rewrite `handleComplete` correctly based on standard orval generated mutations taking { id } if it's in path.
-  // Actually, let me check the generated hooks for `useCompleteTrainingModule` in `api.ts`.
-  // `export const completeTrainingModule = async (id: number, options?: RequestInit): Promise<TrainingCompletion>`
-  
-  const handleCompleteActual = (id: number) => {
-    completeModule.mutate(
-      { id } as any, // The mutation shape is usually `{ id: number }` for path params.
+      { id },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListTrainingModulesQueryKey() });
@@ -96,7 +76,7 @@ export default function Training() {
               ) : (
                 <Button 
                   className="w-full font-mono font-bold tracking-widest" 
-                  onClick={() => handleCompleteActual(mod.id)}
+                  onClick={() => handleComplete(mod.id)}
                   disabled={completeModule.isPending}
                 >
                   <PlayCircle className="w-4 h-4 mr-2" />

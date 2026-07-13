@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard - Training</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">Phish<span>Guard</span></div>
+            <div class="nav-links">
+                <a href="dashboard.html">Dashboard</a>
+                <a href="training.html" class="active">Training</a>
+                <a href="quiz.html">Quiz</a>
+                <a href="results.html">Results</a>
+                <a href="profile.html">Profile</a>
+                <a href="admin.html">Admin</a>
+                <span class="user-info" id="username-display">User</span>
+                <button class="logout" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2>📚 Training Modules</h2>
+                <span style="color:#8899bb;font-size:14px;" id="progress-text">Progress: 0/8 completed</span>
+            </div>
+            <div class="progress-bar">
+                <div class="fill" id="progress-fill" style="width:0%"></div>
+            </div>
+            <p style="color: #8899bb; margin: 15px 0 20px 0;">Complete each module to improve your phishing awareness. Click a module to start!</p>
+            <div id="training-list"></div>
+        </div>
+
+        <!-- Module Detail View -->
+        <div class="module-detail" id="module-detail">
+            <h2 id="module-title">Module Title</h2>
+            <p id="module-level" style="color:#8899bb;"></p>
+            <div class="content" id="module-content"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
+                <button class="btn-back" onclick="closeModule()">⬅ Back to Modules</button>
+                <button class="btn-complete" id="module-complete-btn" onclick="completeModule()">✅ Mark as Complete</button>
+            </div>
+        </div>
+
+        <!-- Risk Dashboard -->
+        <div class="card" id="risk-dashboard" style="margin-top:20px; display:block;">
+            <h2>📊 Your Progress</h2>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:15px; margin-top:15px;">
+                <div class="stat-card"><div class="number" id="rd-completed">-</div><div class="label">Modules Completed</div></div>
+                <div class="stat-card"><div class="number" id="rd-overall-score">-</div><div class="label">Overall Score</div></div>
+                <div class="stat-card"><div class="number" id="rd-risk-level" style="font-size:24px;">-</div><div class="label">Risk Level</div></div>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
