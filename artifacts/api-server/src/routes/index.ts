@@ -1,22 +1,41 @@
-import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import authRouter from "./auth";
-import usersRouter from "./users";
-import phishingRouter from "./phishing";
-import trainingRouter from "./training";
-import riskRouter from "./risk";
-import dashboardRouter from "./dashboard";
-import campaignsRouter from "./campaigns";
+import express, { type Express } from "express";
+import cors from "cors";
+import pinoHttp from "pino-http";
+import router from "./routes";
+import { logger } from "./lib/logger";
 
-const router: IRouter = Router();
+const app: Express = express();
 
-router.use(healthRouter);
-router.use("/auth", authRouter);
-router.use("/users", usersRouter);
-router.use("/phishing", phishingRouter);
-router.use("/training", trainingRouter);
-router.use("/risk", riskRouter);
-router.use("/dashboard", dashboardRouter);
-router.use("/campaigns", campaignsRouter);
+// Enable CORS for all origins (allows your frontend to connect)
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
+}));
 
-export default router;
+app.use(
+  pinoHttp({
+    logger,
+    serializers: {
+      req(req) {
+        return {
+          id: req.id,
+          method: req.method,
+          url: req.url?.split("?")[0],
+        };
+      },
+      res(res) {
+        return {
+          statusCode: res.statusCode,
+        };
+      },
+    },
+  })
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/api", router);
+
+export default app;

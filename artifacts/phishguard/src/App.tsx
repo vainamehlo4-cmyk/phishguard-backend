@@ -11,6 +11,7 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Inbox from "@/pages/inbox";
 import Training from "@/pages/training";
+import Quiz from "@/pages/quiz";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminUsers from "@/pages/admin-users";
 import AdminSimulations from "@/pages/admin-simulations";
@@ -33,6 +34,7 @@ function Router() {
             <ProtectedRoute path="/dashboard" component={Dashboard} />
             <ProtectedRoute path="/inbox" component={Inbox} />
             <ProtectedRoute path="/training" component={Training} />
+            <ProtectedRoute path="/quiz" component={Quiz} />
             <ProtectedRoute path="/admin" component={AdminDashboard} adminOnly />
             <ProtectedRoute path="/admin/users" component={AdminUsers} adminOnly />
             <ProtectedRoute path="/admin/simulations" component={AdminSimulations} adminOnly />
