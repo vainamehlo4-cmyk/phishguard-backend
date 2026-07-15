@@ -39,10 +39,11 @@ export default function Login() {
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     // Debug: confirm what RHF + Zod produced at submit time
     console.debug("login submit values", {
-      username: values.username,
+      username: JSON.stringify(values.username),
       passwordLength: values.password?.length,
       raw: values,
     });
+
 
     loginMutation.mutate(
       { data: values },
