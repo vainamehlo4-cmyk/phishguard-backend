@@ -26,10 +26,10 @@
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                 <h2>📚 Training Modules</h2>
-                <span style="color:#8899bb;font-size:14px;" id="progress-text">Progress: 0/8 completed</span>
+                <span style="color:#0078D4; font-weight:bold; font-size:16px;" id="progress-text">Progress: 0/8 completed</span>
             </div>
             <div class="progress-bar">
-                <div class="fill" id="progress-fill" style="width:0%"></div>
+                <div class="fill" id="progress-fill" style="width:0%;"></div>
             </div>
             <p style="color: #8899bb; margin: 15px 0 20px 0;">Complete each module to improve your phishing awareness. Click a module to start!</p>
             <div id="training-list"></div>
@@ -43,16 +43,6 @@
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
                 <button class="btn-back" onclick="closeModule()">⬅ Back to Modules</button>
                 <button class="btn-complete" id="module-complete-btn" onclick="completeModule()">✅ Mark as Complete</button>
-            </div>
-        </div>
-
-        <!-- Risk Dashboard -->
-        <div class="card" id="risk-dashboard" style="margin-top:20px; display:block;">
-            <h2>📊 Your Progress</h2>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:15px; margin-top:15px;">
-                <div class="stat-card"><div class="number" id="rd-completed">-</div><div class="label">Modules Completed</div></div>
-                <div class="stat-card"><div class="number" id="rd-overall-score">-</div><div class="label">Overall Score</div></div>
-                <div class="stat-card"><div class="number" id="rd-risk-level" style="font-size:24px;">-</div><div class="label">Risk Level</div></div>
             </div>
         </div>
     </div>

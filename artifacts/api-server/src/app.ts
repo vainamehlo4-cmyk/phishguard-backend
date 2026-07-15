@@ -7,10 +7,28 @@ import { logger } from "./lib/logger";
 const app: Express = express();
 
 const corsOptions: cors.CorsOptions = {
-  origin: process.env.FRONTEND_URL ?? true,
+  // Render deployments can shift hostnames across environments.
+  // Reflect the request Origin header when present, to avoid mismatched
+  // Access-Control-Allow-Origin responses.
+  origin: (requestOrigin, callback) => {
+    if (!requestOrigin) return callback(null, true);
+
+    // Allow your known frontend domains (add more as needed).
+    const allowed = new Set([
+      process.env.FRONTEND_URL,
+      "https://phishguard-backend-1-ijpp.onrender.com",
+      "https://phishguard-front-end.onrender.com",
+      "http://localhost:3000",
+      "http://localhost:5173",
+    ].filter(Boolean) as string[]);
+
+    if (allowed.has(requestOrigin)) return callback(null, true);
+    return callback(new Error(`CORS origin not allowed: ${requestOrigin}`));
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
+
 
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
