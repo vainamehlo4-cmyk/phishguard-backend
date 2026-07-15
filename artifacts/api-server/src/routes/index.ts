@@ -1,22 +1,22 @@
-import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import authRouter from "./auth";
-import usersRouter from "./users";
-import phishingRouter from "./phishing";
-import trainingRouter from "./training";
-import riskRouter from "./risk";
-import dashboardRouter from "./dashboard";
-import campaignsRouter from "./campaigns";
+import { Router } from "express";
+import auth from "./auth";
+import users from "./users";
+import dashboard from "./dashboard";
+import health from "./health";
+import risk from "./risk";
+import campaigns from "./campaigns";
+import phishing from "./phishing";
+import training from "./training";
 
-const router: IRouter = Router();
+const router = Router();
 
-router.use(healthRouter);
-router.use("/auth", authRouter);
-router.use("/users", usersRouter);
-router.use("/phishing", phishingRouter);
-router.use("/training", trainingRouter);
-router.use("/risk", riskRouter);
-router.use("/dashboard", dashboardRouter);
-router.use("/campaigns", campaignsRouter);
+router.use("/auth", auth);
+router.use("/users", users);
+router.use("/dashboard", dashboard);
+router.use("/health", health);
+router.use("/risk", risk);
+router.use("/campaigns", campaigns);
+router.use("/phishing", phishing);
+router.use("/training", training);
 
 export default router;

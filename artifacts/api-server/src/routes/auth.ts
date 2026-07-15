@@ -1,7 +1,9 @@
+
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { pool } from "@workspace/db";
+import { pool, db, usersTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
@@ -86,6 +88,7 @@ export function adminMiddleware(req: any, res: any, next: any) {
   next();
 }
 
+// Login route
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -114,6 +117,55 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Login failed", error);
     return res.status(500).json({ error: "Unable to sign in right now" });
+  }
+});
+
+// Register new user
+router.post("/register", async (req, res) => {
+  const { username, password, email, fullName } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: "Username and password are required" });
+  }
+  
+  if (password.length < 4) {
+    return res.status(400).json({ error: "Password must be at least 4 characters" });
+  }
+  
+  try {
+    // Check if user already exists
+    const [existingUser] = await db.select().from(usersTable).where(eq(usersTable.username, username));
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already exists" });
+    }
+    
+    // Hash the password
+    const saltRounds = 10;
+    const password_hash = await bcrypt.hash(password, saltRounds);
+    
+    // Insert the new user (use table field names defined in schema)
+    const [newUser] = await db.insert(usersTable).values({
+      username,
+      passwordHash: password_hash,
+      email: email || null,
+      fullName: fullName || null,
+      role: "user",
+      createdAt: new Date(),
+    }).returning();
+    
+    // Return user info
+    return res.status(201).json({
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        fullName: newUser.fullName,
+        role: newUser.role,
+      }
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 

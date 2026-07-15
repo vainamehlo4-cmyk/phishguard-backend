@@ -1,11 +1,12 @@
 import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
+  fullName: text("fullName"),
   passwordHash: text("password_hash").notNull(),
   role: text("role").notNull().default("user"),
   department: text("department"),

@@ -37,6 +37,13 @@ export default function Login() {
   }, [user, setLocation]);
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
+    // Debug: confirm what RHF + Zod produced at submit time
+    console.debug("login submit values", {
+      username: values.username,
+      passwordLength: values.password?.length,
+      raw: values,
+    });
+
     loginMutation.mutate(
       { data: values },
       {
@@ -48,10 +55,16 @@ export default function Login() {
           });
         },
         onError: (err: any) => {
+          // Surface backend validation/401 in the UI
+          const backendMessage =
+            err?.response?.data?.error ||
+            err?.response?.data?.message ||
+            err?.message;
+
           toast({
             variant: "destructive",
             title: "Access Denied",
-            description: err.message || "Invalid credentials.",
+            description: backendMessage || "Invalid credentials.",
           });
         },
       }

@@ -47,6 +47,19 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Render (and other platforms) may probe the service using HEAD/GET on `/`.
+// The API itself lives under `/api`, so return a lightweight OK response here
+// to avoid 404s causing health/startup checks to fail.
+app.get("/", (_req, res) => {
+  res.json({ ok: true });
+});
+
+app.head("/", (_req, res) => {
+  res.status(200).end();
+});
+
 app.use("/api", router);
 
 export default app;
+
+
