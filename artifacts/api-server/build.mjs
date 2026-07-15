@@ -3,7 +3,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
+import fs from "node:fs";
 import { rm } from "node:fs/promises";
+
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
@@ -14,7 +16,32 @@ async function buildAll() {
   const distDir = path.resolve(artifactDir, "dist");
   await rm(distDir, { recursive: true, force: true });
 
+  // Build frontend and copy its output into the backend so Express can serve it.
+  // Frontend build output is configured as: artifacts/phishguard/dist/public
+  const frontendAppDir = path.resolve(artifactDir, "..", "phishguard");
+  const frontendDistPublic = path.resolve(frontendAppDir, "dist", "public");
+  const backendPublicDir = path.resolve(artifactDir, "src", "public");
+
+  // Clean and recreate backend static directory
+  await rm(backendPublicDir, { recursive: true, force: true });
+  await fs.promises.mkdir(backendPublicDir, { recursive: true });
+
+  // Copy frontend build output into backend static dir
+  if (!fs.existsSync(frontendDistPublic)) {
+    console.warn(
+      `⚠️ Frontend dist not found at ${frontendDistPublic}. Expected Render build step to produce it.`,
+    );
+  } else {
+    await fs.promises.cp(frontendDistPublic, backendPublicDir, {
+      recursive: true,
+      force: true,
+    });
+  }
+
+
+
   await esbuild({
+
     entryPoints: [path.resolve(artifactDir, "src/index.ts")],
     platform: "node",
     bundle: true,

@@ -78,6 +78,36 @@ app.head("/", (_req, res) => {
 
 app.use("/api", router);
 
+// ---------------------------------------------------------------------------
+// Frontend (served from a build copied into src/public during CI/build)
+// ---------------------------------------------------------------------------
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import fs from "node:fs";
+import serveStatic from "serve-static";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Backend will host the built frontend from artifacts/api-server/src/public
+const frontendDir = process.env.FRONTEND_DIST_DIR
+  ? path.resolve(process.env.FRONTEND_DIST_DIR)
+  : path.resolve(__dirname, "public");
+
+// Serve only if the directory exists; this keeps dev/API usage safe.
+if (fs.existsSync(frontendDir)) {
+  app.use(serveStatic(frontendDir, { index: false }));
+
+  // SPA fallback
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(frontendDir, "index.html"));
+  });
+}
+
 export default app;
+
+
+
+
 
 
