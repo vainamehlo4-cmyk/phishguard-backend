@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
-    "start": "pnpm --filter @workspace/api-server start",
+    "start": "node server.js",
     "typecheck:libs": "tsc --build",
     "typecheck": "tsc --build"
   },
