@@ -1,4 +1,4 @@
-﻿// ========== API URL ==========
+// ========== API URL ==========
 const API_URL = '';
 
 // ========== Shared Functions ==========
@@ -1081,4 +1081,250 @@ document.addEventListener('DOMContentLoaded', function() {
         window.generateReport = generateReport;
     }
     updateUsernameDisplay();
+});
+
+// ========== Service Worker Registration ==========
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+                        labels: { color: '#8899bb' }
+                    }
+                }
+            }
+        });
+
+        const ctx2 = document.getElementById('passFailChart').getContext('2d');
+        passFailChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Passed', 'Failed'],
+                datasets: [{
+                    data: [totalPassed, totalFailed],
+                    backgroundColor: ['#4caf50', '#f44336'],
+                    borderColor: ['#1a5c2a', '#5c1a1a'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        labels: { color: '#8899bb' }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading admin charts:', error);
+    }
+}
+
+// ========== Generate Report ==========
+
+window.generateReport = async function() {
+    const container = document.getElementById('report-container');
+    const content = document.getElementById('report-content');
+    container.style.display = 'block';
+    content.innerHTML = '<div class="loading-text">Generating report...</div>';
+    
+    try {
+        const response = await fetch(`${API_URL}/api/users`);
+        const users = await response.json();
+        const filtered = users.filter(u => u.username.toLowerCase() !== 'john');
+        
+        let html = `<table style="width:100%;border-collapse:collapse;margin-top:10px;">
+            <thead style="background:#1a2a4a;">
+                <tr>
+                    <th style="padding:8px;text-align:left;">User</th>
+                    <th style="padding:8px;text-align:center;">Total Quizzes</th>
+                    <th style="padding:8px;text-align:center;">Avg Score</th>
+                    <th style="padding:8px;text-align:center;">Passed</th>
+                    <th style="padding:8px;text-align:center;">Failed</th>
+                    <th style="padding:8px;text-align:center;">Pass Rate</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        
+        for (const u of filtered) {
+            const statsRes = await fetch(`${API_URL}/api/users/${u.id}/stats`);
+            const stats = await statsRes.json();
+            const total = stats.totalQuizzes || 0;
+            const passed = stats.passedCount || 0;
+            const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+            html += `
+                <tr style="border-bottom:1px solid #1a2a4a;">
+                    <td style="padding:8px;">${u.username}</td>
+                    <td style="padding:8px;text-align:center;">${total}</td>
+                    <td style="padding:8px;text-align:center;">${stats.averageScore || 0}%</td>
+                    <td style="padding:8px;text-align:center;color:#4caf50;">${passed}</td>
+                    <td style="padding:8px;text-align:center;color:#f44336;">${stats.failCount || 0}</td>
+                    <td style="padding:8px;text-align:center;font-weight:bold;">${passRate}%</td>
+                </tr>
+            `;
+        }
+        html += `</tbody></table>
+            <p style="margin-top:15px;color:#8899bb;font-size:14px;">Report generated on ${new Date().toLocaleString()}</p>
+            <button onclick="window.print()" style="margin-top:10px;background:#0078D4;padding:8px 20px;border:none;border-radius:6px;color:white;cursor:pointer;">🖨️ Print Report</button>
+        `;
+        content.innerHTML = html;
+    } catch (error) {
+        content.innerHTML = '<div class="loading-text">Error generating report</div>';
+        console.error(error);
+    }
+};
+
+// ========== Page Initialization ==========
+
+document.addEventListener('DOMContentLoaded', function() {
+    const path = window.location.pathname;
+
+    if (path.endsWith('index.html') || path === '/') {
+        const statusEl = document.getElementById('status');
+        if (statusEl) {
+            checkBackend().then(online => {
+                statusEl.textContent = online ? '✅ Online' : '❌ Offline';
+                statusEl.className = online ? 'online' : 'offline';
+            });
+        }
+        const form = document.getElementById('login-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const msgEl = document.getElementById('message');
+                const result = await loginUser(username, password);
+                if (!result.success) {
+                    msgEl.textContent = '❌ ' + (result.error || 'Login failed');
+                }
+            });
+        }
+
+        window.showRegister = function() {
+            document.getElementById('register-form').style.display = 'block';
+        };
+        window.hideRegister = function() {
+            document.getElementById('register-form').style.display = 'none';
+        };
+
+        const regBtn = document.getElementById('register-btn');
+        if (regBtn) {
+            regBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const username = document.getElementById('reg-username').value;
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+                const msgEl = document.getElementById('reg-message');
+                
+                if (!username || username.length < 3) {
+                    msgEl.textContent = '❌ Username must be at least 3 characters';
+                    msgEl.style.color = '#f44336';
+                    return;
+                }
+                if (!email || !email.includes('@')) {
+                    msgEl.textContent = '❌ Please enter a valid email';
+                    msgEl.style.color = '#f44336';
+                    return;
+                }
+                if (!password || password.length < 4) {
+                    msgEl.textContent = '❌ Password must be at least 4 characters';
+                    msgEl.style.color = '#f44336';
+                    return;
+                }
+                
+                const result = await registerUser(username, email, password);
+                if (result.success) {
+                    msgEl.textContent = '✅ User created! Logging you in...';
+                    msgEl.style.color = '#4caf50';
+                    document.getElementById('reg-username').value = '';
+                    document.getElementById('reg-email').value = '';
+                    document.getElementById('reg-password').value = '';
+                    const loginResult = await loginUser(username, password);
+                    if (!loginResult.success) {
+                        msgEl.textContent = '✅ User created! Please login.';
+                        msgEl.style.color = '#4caf50';
+                        setTimeout(() => { window.hideRegister(); }, 2000);
+                    }
+                } else {
+                    msgEl.textContent = '❌ ' + (result.error || 'Registration failed');
+                    msgEl.style.color = '#f44336';
+                }
+            });
+        }
+    }
+
+    if (path.endsWith('dashboard.html')) {
+        loadDashboard();
+        setInterval(loadDashboard, 30000);
+    }
+    if (path.endsWith('training.html')) {
+        loadTraining();
+        window.completeModule = completeModule;
+        window.closeModule = closeModule;
+        window.openModule = openModule;
+    }
+    if (path.endsWith('quiz.html')) { loadQuiz(); }
+    if (path.endsWith('results.html')) { loadResults(); }
+    if (path.endsWith('profile.html')) { loadProfile(); }
+    if (path.endsWith('admin.html')) {
+        const user = requireAuth();
+        if (!user) return;
+        updateUsernameDisplay();
+        window.adminLogin = adminLogin;
+        window.generateReport = generateReport;
+    }
+    updateUsernameDisplay();
+});
+
+// ========== Service Worker Registration ==========
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+    });
+}
+
+// ========== PWA Install Prompt ==========
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Attempt to add install button to nav links if they exist
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks && !document.getElementById('pwa-install-btn')) {
+        const installBtn = document.createElement('button');
+        installBtn.id = 'pwa-install-btn';
+        installBtn.innerHTML = '📥 Install App';
+        installBtn.className = 'logout'; // Reuse logout button styling
+        installBtn.style.backgroundColor = '#4caf50'; // Make it green
+        installBtn.style.marginRight = '10px';
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            }
+        });
+        
+        navLinks.insertBefore(installBtn, navLinks.firstChild);
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) installBtn.style.display = 'none';
+    console.log('PWA was installed');
 });
